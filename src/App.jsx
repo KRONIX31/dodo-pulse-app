@@ -114,6 +114,29 @@ export default function App() {
     }
   }
 
+  async function handleCategoryChange(id, category) {
+    try {
+      const updated = await api.updateCategory(id, category);
+      setReviews((current) => current.map((review) => (review.id === id ? updated : review)));
+      showToast(`Категория изменена на «${category}».`);
+    } catch (error) {
+      showToast(error.message);
+    }
+  }
+
+  async function handleDeleteReview(id) {
+    if (!window.confirm('Удалить отзыв? Это действие нельзя отменить.')) return;
+    try {
+      await api.deleteReview(id);
+      const rest = reviews.filter((review) => review.id !== id);
+      setReviews(rest);
+      if (selectedId === id) setSelectedId(rest[0]?.id ?? null);
+      showToast('Отзыв удалён.');
+    } catch (error) {
+      showToast(error.message);
+    }
+  }
+
   async function handleAddReview(payload) {
     setSaving(true);
     try {
@@ -161,6 +184,8 @@ export default function App() {
         selectedId={selectedId}
         onSelect={setSelectedId}
         onStatusChange={handleStatusChange}
+        onCategoryChange={handleCategoryChange}
+        onDelete={handleDeleteReview}
         initialStatus={page === 'manual' ? 'manual' : 'Все'}
         initialCategory={selectedCategory}
         onExport={() => exportReviews(reviews)}

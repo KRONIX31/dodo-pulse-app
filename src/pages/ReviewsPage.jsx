@@ -5,7 +5,7 @@ import ReviewDetail from '../components/ReviewDetail.jsx';
 
 const ALL = 'Все';
 
-export default function ReviewsPage({ reviews, selectedId, onSelect, onStatusChange, initialStatus = ALL, initialCategory = ALL, onExport }) {
+export default function ReviewsPage({ reviews, selectedId, onSelect, onStatusChange, onCategoryChange, onDelete, initialStatus = ALL, initialCategory = ALL, onExport }) {
   const [query, setQuery] = useState('');
   const [source, setSource] = useState(ALL);
   const [branch, setBranch] = useState(ALL);
@@ -97,7 +97,7 @@ export default function ReviewsPage({ reviews, selectedId, onSelect, onStatusCha
           ))}
           {filtered.length === 0 && <div className="empty-state empty-large"><Icon name="search" size={24} /><strong>Ничего не найдено</strong><span>Попробуйте изменить запрос или фильтры.</span></div>}
         </div>
-        <ReviewDetail review={visibleSelectedReview} onStatusChange={onStatusChange} />
+        <ReviewDetail review={visibleSelectedReview} onStatusChange={onStatusChange} onCategoryChange={onCategoryChange} onDelete={onDelete} />
       </div>
     </>
   );

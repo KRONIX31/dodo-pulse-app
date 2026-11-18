@@ -1,7 +1,8 @@
 import Icon from './Icon.jsx';
+import { CATEGORIES } from '../../shared/classify.js';
 import { formatDate, getSourceMark, sentimentLabel, statusLabel } from '../utils/format.js';
 
-export default function ReviewDetail({ review, onStatusChange }) {
+export default function ReviewDetail({ review, onStatusChange, onCategoryChange, onDelete }) {
   if (!review) {
     return (
       <aside className="detail-panel detail-empty">
@@ -14,6 +15,7 @@ export default function ReviewDetail({ review, onStatusChange }) {
 
   const sourceClass = ({ 'Яндекс Карты': 'yandex', '2ГИС': 'twogis', Приложение: 'app', Соцсети: 'social' })[review.source] || 'other';
   const sentiment = review.sentiment === 'positive' ? 'positive' : review.sentiment === 'negative' ? 'negative' : 'neutral';
+
   return (
     <aside className="detail-panel">
       <div className="detail-heading">
@@ -43,7 +45,26 @@ export default function ReviewDetail({ review, onStatusChange }) {
         </div>
         <div className="confidence-track"><span style={{ width: `${review.confidence}%` }} /></div>
         <p>{review.reason}</p>
-        {review.confidence < 70 && <div className="inline-warning"><Icon name="alert" size={15} /> Невысокая уверенность — проверьте категорию вручную.</div>}
+      </div>
+
+      <div className="category-box">
+        <div className="category-heading">
+          <strong>Категория обращения</strong>
+          <small>Если тема определена неверно, выберите её вручную</small>
+        </div>
+        <select
+          className="category-select"
+          value={review.category}
+          onChange={(event) => onCategoryChange(review.id, event.target.value)}
+          aria-label="Категория отзыва"
+        >
+          {CATEGORIES.map((item) => <option key={item} value={item}>{item}</option>)}
+        </select>
+        {review.confidence < 70 && (
+          <div className="inline-warning">
+            <Icon name="alert" size={15} /> Классификатор не уверен в теме — проверьте категорию.
+          </div>
+        )}
       </div>
 
       <div className="detail-note">
@@ -71,6 +92,14 @@ export default function ReviewDetail({ review, onStatusChange }) {
           <div className="detail-status-hint"><Icon name="clock" size={15} /> Ожидает проверки управляющим</div>
         )}
       </div>
+
+      <div className="detail-delete">
+        <button className="button button-danger full-width" onClick={() => onDelete(review.id)}>
+          <Icon name="close" size={16} /> Удалить отзыв
+        </button>
+        <span className="delete-hint">Например, если обращение содержит мат или оскорбления</span>
+      </div>
+
       <div className="detail-id"><span className={`source-mark source-mark-${sourceClass}`}>{getSourceMark(review.source)}</span> Источник: {review.source}</div>
     </aside>
   );

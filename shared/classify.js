@@ -43,6 +43,18 @@ const rules = [
   },
 ];
 
+// Полный список категорий для ручного выбора управляющим
+export const CATEGORIES = [...rules.map((rule) => rule.category), 'Другое'];
+
+// Признаки категории при ручном выборе
+export function getCategoryInfo(category) {
+  const rule = rules.find((item) => item.category === category);
+  return {
+    sentiment: rule ? rule.sentiment : 'neutral',
+    critical: rule ? rule.critical : false,
+  };
+}
+
 export function classifyReview(text) {
   const normalized = String(text || '').toLowerCase().replaceAll('ё', 'е');
   const matches = rules

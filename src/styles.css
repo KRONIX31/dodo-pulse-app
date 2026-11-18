@@ -332,3 +332,17 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   .sort-control { width: 100%; justify-content: space-between; }
   .sort-control select { flex: 1; max-width: 70%; min-width: 0; }
 }
+
+/* Ручной выбор категории */
+.category-box { padding: 15px 0 12px; border-top: 1px solid #eef0f3; }
+.category-heading { display: flex; flex-direction: column; gap: 3px; }
+.category-heading strong { color: #4a5360; font-size: 0.75rem; }
+.category-heading small { color: #9aa2ad; font-size: 0.75rem; }
+.category-select { width: 100%; height: 38px; margin: 10px 0 0; padding: 0 29px 0 10px; border: 1px solid #e8eaee; border-radius: 8px; color: #36404d; background: #fbfcfd; font-size: 0.8rem; outline: none; }
+.category-select:focus { border-color: #f1aa8e; background: #fff; }
+
+/* Удаление отзыва */
+.button-danger { color: #fff; background: var(--red); border-color: var(--red); box-shadow: 0 4px 10px rgba(217, 75, 75, .14); }
+.button-danger:hover { background: #c74040; border-color: #c74040; }
+.detail-delete { display: flex; flex-direction: column; gap: 6px; margin-top: 14px; padding-top: 12px; border-top: 1px dashed #eef0f3; }
+.delete-hint { color: #a0a7b1; font-size: 0.75rem; text-align: center; line-height: 1.4; }

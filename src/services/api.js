@@ -29,6 +29,17 @@ export const api = {
     });
     return data.review;
   },
+  async updateCategory(id, category) {
+    const data = await request(`/api/reviews/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ category }),
+    });
+    return data.review;
+  },
+  async deleteReview(id) {
+    const data = await request(`/api/reviews/${id}`, { method: 'DELETE' });
+    return data.deleted;
+  },
   async reset() {
     const data = await request('/api/reset', { method: 'POST' });
     return data.reviews;
