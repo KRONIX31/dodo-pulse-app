@@ -2,7 +2,7 @@ import express from 'express';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ensureStore, getReviews, saveReviews, resetReviews } from './store.js';
-import { classifyReview } from '../shared/classify.js';
+import { classifyReview, CATEGORIES, getCategoryInfo } from '../shared/classify.js';
 
 const app = express();
 const PORT = Number(process.env.PORT || 3001);
@@ -58,16 +58,57 @@ app.post('/api/reviews', async (req, res, next) => {
 app.patch('/api/reviews/:id', async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    const { status } = req.body || {};
-    if (!Number.isInteger(id) || !['new', 'manual', 'done'].includes(status)) {
+    const { status, category } = req.body || {};
+    const hasStatus = typeof status === 'string';
+    const hasCategory = typeof category === 'string';
+
+    if (!Number.isInteger(id) || (!hasStatus && !hasCategory)) {
       return res.status(400).json({ message: 'Некорректный запрос.' });
     }
+    if (hasStatus && !['new', 'manual', 'done'].includes(status)) {
+      return res.status(400).json({ message: 'Некорректный статус.' });
+    }
+    if (hasCategory && !CATEGORIES.includes(category)) {
+      return res.status(400).json({ message: 'Некорректная категория.' });
+    }
+
     const reviews = await getReviews();
     const index = reviews.findIndex((item) => item.id === id);
     if (index === -1) return res.status(404).json({ message: 'Отзыв не найден.' });
-    reviews[index] = { ...reviews[index], status };
+
+    const updates = {};
+    if (hasStatus) updates.status = status;
+    if (hasCategory) {
+      const info = getCategoryInfo(category);
+      updates.category = category;
+      updates.sentiment = info.sentiment;
+      updates.critical = info.critical;
+      updates.confidence = 100;
+      updates.reason = 'Категория определена управляющим вручную.';
+    }
+
+    reviews[index] = { ...reviews[index], ...updates };
     await saveReviews(reviews);
     res.json({ review: reviews[index] });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.delete('/api/reviews/:id', async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id)) {
+      return res.status(400).json({ message: 'Некорректный запрос.' });
+    }
+
+    const reviews = await getReviews();
+    const index = reviews.findIndex((item) => item.id === id);
+    if (index === -1) return res.status(404).json({ message: 'Отзыв не найден.' });
+
+    const [removed] = reviews.splice(index, 1);
+    await saveReviews(reviews);
+    res.json({ deleted: removed.id });
   } catch (error) {
     next(error);
   }
